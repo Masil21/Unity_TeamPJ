@@ -17,7 +17,7 @@ UserSettings/
 Packages/
 ProjectSettings/
 
-# Only track Assets/4.SDH
+# Only track Assets/2.SDH
 Assets/*
-!Assets/4.SDH/
-!Assets/4.SDH.meta
+!Assets/2.SDH/
+!Assets/2.SDH.meta
