@@ -1,23 +1,39 @@
-# Editor settings
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emory[Cc]aptures/
+
+.vs/
 .vscode/
 
-# Unity generated
-Library/
-Temp/
-Logs/
-obj/
-Build/
-Builds/
-UserSettings/
+ExportedObj/
 *.csproj
+*.unityproj
 *.sln
 *.slnx
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
 
-# Packages and Settings (not needed)
-Packages/
-ProjectSettings/
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
 
-# Only track Assets/2.SDH
-Assets/*
-!Assets/2.SDH/
-!Assets/2.SDH.meta
+sysinfo.txt
+
+*.apk
+*.aab
+*.unitypackage
+*.app
