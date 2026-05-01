@@ -1,0 +1,20 @@
+# Unity generated
+Library/
+Temp/
+Logs/
+obj/
+Build/
+Builds/
+UserSettings/
+*.csproj
+*.sln
+*.slnx
+
+# Packages and Settings (not needed)
+Packages/
+ProjectSettings/
+
+# Only track Assets/4.SDH
+Assets/*
+!Assets/4.SDH/
+!Assets/4.SDH.meta
