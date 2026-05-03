@@ -1,0 +1,79 @@
+using TMPro;
+using UnityEngine;
+
+public class Player : MonoBehaviour
+{
+    public float speed = 5f;
+    public GameObject bulletPrefab;
+    public float fireInterval = 0.2f;
+    public Transform bulletSpawnOffset;
+    private float _fireTimer;
+    private float _halfWidth;
+    private float _halfHeight;
+    private Animator _animator;
+    private const int StateIdle = 0;
+    private const int StateLeft = 1;
+    private const int StateRight = 2;
+
+    void Start()
+    {
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        _halfWidth = sr.bounds.extents.x;
+        _halfHeight = sr.bounds.extents.y;
+        _animator = GetComponentInChildren<Animator>();
+    }
+
+    void Update()
+    {
+        MovePlayer();
+        if (Input.GetMouseButton(0))
+        {
+            _fireTimer += Time.deltaTime;
+            if (_fireTimer >= fireInterval)
+            {
+                Fire();
+                _fireTimer = 0f;
+            }
+        }
+        else
+        {
+            _fireTimer = 0f;
+        }
+
+        if (Input.GetMouseButtonUp(1))
+        {
+            
+        }
+    }
+
+    void Fire()
+    {
+        Instantiate(bulletPrefab, bulletSpawnOffset.position, Quaternion.identity);
+    }
+
+    void MovePlayer()
+    {
+        float h = Input.GetAxisRaw("Horizontal");
+        float v = Input.GetAxisRaw("Vertical");
+        Vector3 moveDir = new Vector3(h, v, 0f).normalized;
+        transform.position += moveDir * (speed * Time.deltaTime);
+        Vector3 min = Camera.main.ViewportToWorldPoint(new Vector3(0, 0, 0));
+        Vector3 max = Camera.main.ViewportToWorldPoint(new Vector3(1, 1, 0));
+        Vector3 pos = transform.position;
+        pos.x = Mathf.Clamp(pos.x, min.x + _halfWidth, max.x - _halfWidth);
+        pos.y = Mathf.Clamp(pos.y, min.y + _halfHeight, max.y - _halfHeight);
+        transform.position = pos;
+        if (_animator != null)
+        {
+            _animator.SetInteger("State", StateIdle);
+        }
+        else if (h > 0)
+        {
+            _animator.SetInteger("State", StateRight);
+        }
+        else
+        {
+            _animator.SetInteger("State", StateLeft);
+        }
+    }
+}
