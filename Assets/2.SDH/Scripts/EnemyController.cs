@@ -9,17 +9,29 @@ public class EnemyController : MonoBehaviour
     private Animator animator;
     private bool isHit = false;
     private Vector3 moveDirection = Vector3.down;
+    private SpawnPoint spawner;
+    private int maxHp;
 
-    public void SetDirection(Vector3 dir)
-    {
-        moveDirection = dir;
-    }
-
-    void Start()
+    void Awake()
     {
         animator = GetComponent<Animator>();
+        maxHp = hp;
+    }
+
+    public void SetSpawner(SpawnPoint sp) { spawner = sp; }
+
+    public void SetDirection(Vector3 dir) { moveDirection = dir; }
+
+    public void ResetEnemy()
+    {
+        hp = maxHp;
+        isHit = false;
+        StopAllCoroutines();
+        if (animator != null) animator.SetInteger("State", 0);
         StartCoroutine(Move());
     }
+
+    void Start() { }
 
     void Update() { }
 
@@ -27,16 +39,15 @@ public class EnemyController : MonoBehaviour
     {
         while (true)
         {
-            if (this == null) yield break;
+            if (!gameObject.activeInHierarchy) yield break;
             transform.Translate(moveDirection * speed * Time.deltaTime);
             yield return null;
-            if (this == null) yield break;
+            if (!gameObject.activeInHierarchy) yield break;
             Vector3 pos = transform.position;
             if (pos.x < -9.5f || pos.x > 9.5f || pos.y < -5.5f || pos.y > 5.5f)
                 break;
         }
-        if (this != null)
-            Destroy(gameObject);
+        ReturnToPool();
     }
 
     public void TakeDamage(int damage)
@@ -45,7 +56,7 @@ public class EnemyController : MonoBehaviour
         hp -= damage;
         if (hp <= 0)
         {
-            Destroy(gameObject);
+            ReturnToPool();
             return;
         }
         StartCoroutine(HitRoutine());
@@ -54,9 +65,7 @@ public class EnemyController : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("PlayerBullet"))
-        {
             TakeDamage(5);
-        }
     }
 
     IEnumerator HitRoutine()
@@ -68,5 +77,14 @@ public class EnemyController : MonoBehaviour
         yield return new WaitForSeconds(hitLength);
         animator.SetInteger("State", 0);
         isHit = false;
+    }
+
+    void ReturnToPool()
+    {
+        StopAllCoroutines();
+        if (spawner != null)
+            spawner.ReturnToPool(gameObject);
+        else
+            gameObject.SetActive(false);
     }
 }

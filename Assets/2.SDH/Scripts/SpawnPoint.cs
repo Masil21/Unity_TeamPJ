@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class SpawnPoint : MonoBehaviour
 {
     public GameObject[] enemyPrefabs;
+    public int poolSizePerEnemy = 8;
 
     [Header("Top Spawn Points (Point_0~4) - 아래로 이동")]
     public Transform[] topPoints;
@@ -17,10 +19,25 @@ public class SpawnPoint : MonoBehaviour
     public float diagSpawnMinInterval = 3f;
     public float diagSpawnMaxInterval = 6f;
 
+    private Dictionary<GameObject, Queue<GameObject>> pools = new();
+    private Dictionary<GameObject, GameObject> instanceToPrefab = new();
+
     private float topDelta;
     private float topNextInterval;
     private float diagDelta;
     private float diagNextInterval;
+
+    void Awake()
+    {
+        foreach (var prefab in enemyPrefabs)
+        {
+            if (prefab == null) continue;
+            var queue = new Queue<GameObject>();
+            for (int i = 0; i < poolSizePerEnemy; i++)
+                queue.Enqueue(CreatePooled(prefab));
+            pools[prefab] = queue;
+        }
+    }
 
     void Start()
     {
@@ -48,6 +65,38 @@ public class SpawnPoint : MonoBehaviour
         }
     }
 
+    GameObject CreatePooled(GameObject prefab)
+    {
+        var obj = Instantiate(prefab, transform);
+        obj.SetActive(false);
+        instanceToPrefab[obj] = prefab;
+        return obj;
+    }
+
+    GameObject GetFromPool(GameObject prefab, Vector3 position)
+    {
+        if (!pools.TryGetValue(prefab, out var queue))
+            return null;
+
+        var obj = queue.Count > 0 ? queue.Dequeue() : CreatePooled(prefab);
+        obj.transform.SetPositionAndRotation(position, Quaternion.identity);
+        obj.SetActive(true);
+        return obj;
+    }
+
+    public void ReturnToPool(GameObject obj)
+    {
+        if (instanceToPrefab.TryGetValue(obj, out var prefab) && pools.ContainsKey(prefab))
+        {
+            obj.SetActive(false);
+            pools[prefab].Enqueue(obj);
+        }
+        else
+        {
+            Destroy(obj);
+        }
+    }
+
     void SpawnFromTop()
     {
         if (enemyPrefabs == null || enemyPrefabs.Length == 0) return;
@@ -56,9 +105,16 @@ public class SpawnPoint : MonoBehaviour
         int idx = Random.Range(0, topPoints.Length);
         int enemyIdx = Random.Range(0, enemyPrefabs.Length);
 
-        GameObject enemy = Instantiate(enemyPrefabs[enemyIdx], topPoints[idx].position, Quaternion.identity);
-        EnemyController ec = enemy.GetComponent<EnemyController>();
-        if (ec != null) ec.SetDirection(Vector3.down);
+        var obj = GetFromPool(enemyPrefabs[enemyIdx], topPoints[idx].position);
+        if (obj == null) return;
+
+        var ec = obj.GetComponent<EnemyController>();
+        if (ec != null)
+        {
+            ec.SetSpawner(this);
+            ec.ResetEnemy();
+            ec.SetDirection(Vector3.down);
+        }
     }
 
     void SpawnDiagonal()
@@ -72,8 +128,15 @@ public class SpawnPoint : MonoBehaviour
         Vector3 spawnPos = diagStartPoints[diagIdx].position;
         Vector3 dir = (diagEndPoints[diagIdx].position - spawnPos).normalized;
 
-        GameObject enemy = Instantiate(enemyPrefabs[enemyIdx], spawnPos, Quaternion.identity);
-        EnemyController ec = enemy.GetComponent<EnemyController>();
-        if (ec != null) ec.SetDirection(dir);
+        var obj = GetFromPool(enemyPrefabs[enemyIdx], spawnPos);
+        if (obj == null) return;
+
+        var ec = obj.GetComponent<EnemyController>();
+        if (ec != null)
+        {
+            ec.SetSpawner(this);
+            ec.ResetEnemy();
+            ec.SetDirection(dir);
+        }
     }
 }
