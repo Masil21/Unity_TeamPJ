@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class CreateEnemyManager : MonoBehaviour
 {
-    public GameObject enemyPrefab;
+    public GameObject[] enemyPrefabs;
     public float spawnMinInterval = 4f;
     public float spawnMaxInterval = 8f;
     public float spawnY = 5.5f;
@@ -31,8 +31,10 @@ public class CreateEnemyManager : MonoBehaviour
 
     void SpawnEnemy()
     {
+        if (enemyPrefabs == null || enemyPrefabs.Length == 0) return;
         float randomX = Random.Range(spawnXMin, spawnXMax);
         Vector3 spawnPos = new Vector3(randomX, spawnY, 0f);
-        Instantiate(enemyPrefab, spawnPos, Quaternion.identity);
+        int index = Random.Range(0, enemyPrefabs.Length);
+        Instantiate(enemyPrefabs[index], spawnPos, Quaternion.identity);
     }
 }
