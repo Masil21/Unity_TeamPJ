@@ -24,10 +24,10 @@ public class EnemyController : MonoBehaviour
         while (true)
         {
             if (this == null) yield break;
-            transform.Translate(Vector3.down * speed * Time.deltaTime);
+            transform.Translate(Vector3.left * speed * Time.deltaTime);
             yield return null;
             if (this == null) yield break;
-            if (transform.position.y <= -5.5f)
+            if (transform.position.x <= -9.5f)
                 break;
         }
         if (this != null)
