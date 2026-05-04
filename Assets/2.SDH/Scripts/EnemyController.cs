@@ -8,6 +8,12 @@ public class EnemyController : MonoBehaviour
 
     private Animator animator;
     private bool isHit = false;
+    private Vector3 moveDirection = Vector3.down;
+
+    public void SetDirection(Vector3 dir)
+    {
+        moveDirection = dir;
+    }
 
     void Start()
     {
@@ -15,19 +21,18 @@ public class EnemyController : MonoBehaviour
         StartCoroutine(Move());
     }
 
-    void Update()
-    {
-    }
+    void Update() { }
 
     IEnumerator Move()
     {
         while (true)
         {
             if (this == null) yield break;
-            transform.Translate(Vector3.down * speed * Time.deltaTime);
+            transform.Translate(moveDirection * speed * Time.deltaTime);
             yield return null;
             if (this == null) yield break;
-            if (transform.position.y <= -5.5f)
+            Vector3 pos = transform.position;
+            if (pos.x < -9.5f || pos.x > 9.5f || pos.y < -5.5f || pos.y > 5.5f)
                 break;
         }
         if (this != null)
