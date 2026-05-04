@@ -65,15 +65,12 @@ public class Player : MonoBehaviour
         transform.position = pos;
         if (_animator != null)
         {
-            _animator.SetInteger("State", StateIdle);
-        }
-        else if (h > 0)
-        {
-            _animator.SetInteger("State", StateRight);
-        }
-        else
-        {
-            _animator.SetInteger("State", StateLeft);
+            if (h > 0)
+                _animator.SetInteger("State", StateRight);
+            else if (h < 0)
+                _animator.SetInteger("State", StateLeft);
+            else
+                _animator.SetInteger("State", StateIdle);
         }
     }
 }
