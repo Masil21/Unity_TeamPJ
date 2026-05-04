@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 
+// 플레이어 프리팹: Assets/1.SSH/3.Prefab/Player.prefab
 public class Player : MonoBehaviour
 {
     public float speed = 5f;
