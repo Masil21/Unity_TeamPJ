@@ -47,7 +47,11 @@ public class Player : MonoBehaviour
 
         if (Input.GetMouseButtonUp(1))
         {
-            
+            if (UIManager.Instance != null && UIManager.Instance.UseBoom())
+            {
+                // TODO: SkillBoom 프리팹 생성 — 폭탄 단계에서 구현
+            }
+
         }
     }
 
