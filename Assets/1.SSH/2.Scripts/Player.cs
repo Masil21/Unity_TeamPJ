@@ -14,6 +14,10 @@ public class Player : MonoBehaviour
     private const int StateIdle = 0;
     private const int StateLeft = 1;
     private const int StateRight = 2;
+    public GameObject sideBulletPrefab;
+    public GameObject centerBulletPrefab;
+    public int power = 1;
+    public float sideOffset = 0.25f;
 
     void Start()
     {
@@ -48,32 +52,61 @@ public class Player : MonoBehaviour
 
     void Fire()
     {
-        Instantiate(bulletPrefab, bulletSpawnOffset.position, Quaternion.identity);
+        switch (power)
+        {
+            case 1:
+                SpawnBullet(sideBulletPrefab, Vector3.zero);
+                break;
+            
+            case 2:
+                SpawnBullet(sideBulletPrefab,Vector3.left * sideOffset);
+                SpawnBullet(sideBulletPrefab,Vector3.right * sideOffset);
+                break;
+            
+            case 3:
+                SpawnBullet(centerBulletPrefab, Vector3.zero);
+                SpawnBullet(sideBulletPrefab,Vector3.left * sideOffset);
+                SpawnBullet(sideBulletPrefab,Vector3.right * sideOffset);
+                break;
+        }
+    }
+
+    void SpawnBullet(GameObject prefab, Vector3 offset)
+    {
+        Instantiate(prefab, bulletSpawnOffset.position + offset, Quaternion.identity);
     }
 
     void MovePlayer()
     {
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
+
         Vector3 moveDir = new Vector3(h, v, 0f).normalized;
         transform.position += moveDir * (speed * Time.deltaTime);
+
         Vector3 min = Camera.main.ViewportToWorldPoint(new Vector3(0, 0, 0));
         Vector3 max = Camera.main.ViewportToWorldPoint(new Vector3(1, 1, 0));
+
         Vector3 pos = transform.position;
         pos.x = Mathf.Clamp(pos.x, min.x + _halfWidth, max.x - _halfWidth);
         pos.y = Mathf.Clamp(pos.y, min.y + _halfHeight, max.y - _halfHeight);
         transform.position = pos;
+
+        // 애니메이션 처리
         if (_animator != null)
         {
-            _animator.SetInteger("State", StateIdle);
-        }
-        else if (h > 0)
-        {
-            _animator.SetInteger("State", StateRight);
-        }
-        else
-        {
-            _animator.SetInteger("State", StateLeft);
+            if (h > 0)
+            {
+                _animator.SetInteger("State", StateRight);
+            }
+            else if (h < 0)
+            {
+                _animator.SetInteger("State", StateLeft);
+            }
+            else
+            {
+                _animator.SetInteger("State", StateIdle);
+            }
         }
     }
 }
