@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -5,6 +6,8 @@ public class EnemyController : MonoBehaviour
 {
     public float speed = 1f;
     public int hp = 16;
+
+    public Action<Vector3> onDie;
 
     private Animator animator;
     private bool isHit = false;
@@ -56,6 +59,7 @@ public class EnemyController : MonoBehaviour
         hp -= damage;
         if (hp <= 0)
         {
+            onDie?.Invoke(transform.position);
             ReturnToPool();
             return;
         }

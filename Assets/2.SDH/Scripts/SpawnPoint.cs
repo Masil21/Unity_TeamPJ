@@ -114,6 +114,7 @@ public class SpawnPoint : MonoBehaviour
             ec.SetSpawner(this);
             ec.ResetEnemy();
             ec.SetDirection(Vector3.down);
+            ec.onDie = ItemManager3.Instance.CreateItem;
         }
     }
 
@@ -137,6 +138,7 @@ public class SpawnPoint : MonoBehaviour
             ec.SetSpawner(this);
             ec.ResetEnemy();
             ec.SetDirection(dir);
+            ec.onDie = ItemManager3.Instance.CreateItem;
         }
     }
 }
