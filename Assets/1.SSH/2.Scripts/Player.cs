@@ -1,9 +1,10 @@
 using System.Collections;
-using TMPro;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    public static Player Instance;
+
     public float speed = 5f;
     public int hp = 3;
     public int bulletDamage = 5;
@@ -30,6 +31,16 @@ public class Player : MonoBehaviour
     private const int StateIdle = 0;
     private const int StateLeft = 1;
     private const int StateRight = 2;
+
+    void Awake()
+    {
+        Instance = this;
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
+    }
 
     void Start()
     {
@@ -93,7 +104,11 @@ public class Player : MonoBehaviour
     void SpawnBullet(GameObject prefab, Vector3 offset)
     {
         if (prefab == null) return;
-        GameObject bullet = Instantiate(prefab, bulletSpawnOffset.position + offset, Quaternion.identity);
+        Vector3 pos = bulletSpawnOffset.position + offset;
+        GameObject bullet = PlayerBulletPool.Instance != null
+            ? PlayerBulletPool.Instance.Get(prefab, pos)
+            : Instantiate(prefab, pos, Quaternion.identity);
+        if (bullet == null) return;
         PlayerBullet pb = bullet.GetComponent<PlayerBullet>();
         if (pb != null) pb.damage = bulletDamage;
     }
@@ -103,16 +118,23 @@ public class Player : MonoBehaviour
         if (_isInvincible) return;
         hp--;
 
-        if (hp <= 0)
-        {
-            hp = _maxHp;
-            power = 1;
-            StartCoroutine(RespawnRoutine());
-        }
-        else
+        if (hp > 0)
         {
             StartCoroutine(InvincibleRoutine(1.5f));
+            return;
         }
+
+        hp = _maxHp;
+        power = 1;
+
+        bool gameOver = UIManager.Instance != null && UIManager.Instance.DecreaseLife();
+        if (gameOver)
+        {
+            gameObject.SetActive(false);
+            return;
+        }
+
+        StartCoroutine(RespawnRoutine());
     }
 
     IEnumerator RespawnRoutine()
@@ -173,7 +195,10 @@ public class Player : MonoBehaviour
                 if (UIManager.Instance != null) UIManager.Instance.AddScore(300);
                 break;
         }
-        Destroy(other.gameObject);
+        if (ItemManager3.Instance != null)
+            ItemManager3.Instance.ReturnItem(other.gameObject);
+        else
+            Destroy(other.gameObject);
     }
 
     void MovePlayer()

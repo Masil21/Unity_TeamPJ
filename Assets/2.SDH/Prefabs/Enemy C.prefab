@@ -197,6 +197,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
   speed: 1
   hp: 16
+  scoreValue: 300
 --- !u!114 &9333333333333333
 MonoBehaviour:
   m_ObjectHideFlags: 0

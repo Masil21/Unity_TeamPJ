@@ -5,6 +5,9 @@ public class EnemyBullitController : MonoBehaviour
     public float speed = 5f;
     private Vector3 moveDir = Vector3.down;
 
+    void OnEnable()  { BoomEffect.OnBoom += ReturnToPool; }
+    void OnDisable() { BoomEffect.OnBoom -= ReturnToPool; }
+
     public void SetDirection(Vector3 dir)
     {
         moveDir = dir;
@@ -16,7 +19,7 @@ public class EnemyBullitController : MonoBehaviour
 
         Vector3 pos = transform.position;
         if (pos.x < -9.5f || pos.x > 9.5f || pos.y < -5.5f || pos.y > 5.5f)
-            Destroy(gameObject);
+            ReturnToPool();
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -25,7 +28,15 @@ public class EnemyBullitController : MonoBehaviour
         {
             Player player = other.GetComponent<Player>();
             if (player != null) player.TakeDamage();
-            Destroy(gameObject);
+            ReturnToPool();
         }
+    }
+
+    void ReturnToPool()
+    {
+        if (EnemyBulletPool.Instance != null)
+            EnemyBulletPool.Instance.Return(gameObject);
+        else
+            Destroy(gameObject);
     }
 }

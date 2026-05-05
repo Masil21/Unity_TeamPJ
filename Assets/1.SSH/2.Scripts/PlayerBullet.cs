@@ -16,7 +16,7 @@ public class PlayerBullet : MonoBehaviour
         transform.position += Vector3.up * speed * Time.deltaTime;
 
         if (transform.position.y > _despawnY)
-            Destroy(gameObject);
+            ReturnToPool();
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -25,7 +25,15 @@ public class PlayerBullet : MonoBehaviour
         {
             EnemyController ec = other.GetComponent<EnemyController>();
             if (ec != null) ec.TakeDamage(damage);
-            Destroy(gameObject);
+            ReturnToPool();
         }
+    }
+
+    void ReturnToPool()
+    {
+        if (PlayerBulletPool.Instance != null)
+            PlayerBulletPool.Instance.Return(gameObject);
+        else
+            Destroy(gameObject);
     }
 }

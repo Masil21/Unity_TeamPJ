@@ -15,8 +15,6 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI finalScoreText;
 
-    [SerializeField] float respawnInvincibleDuration = 2f;
-
     private int score;
     private int boomCount;
     private int lastScoreShown = int.MinValue;
@@ -34,12 +32,56 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
+        AutoFindUIReferences();
+
         if (retryButton != null)
             retryButton.onClick.AddListener(OnRetryButtonClick);
 
         UpdateScoreText(force: true);
         if (gameOverPanel != null)
             gameOverPanel.SetActive(false);
+    }
+
+    void AutoFindUIReferences()
+    {
+        Canvas canvas = FindAnyObjectByType<Canvas>();
+        if (canvas == null) return;
+        Transform ct = canvas.transform;
+
+        if (images == null || images.Length == 0 || images[0] == null)
+        {
+            images = new Image[3];
+            for (int i = 0; i < 3; i++)
+            {
+                Transform t = ct.Find("Life_" + (i + 1));
+                if (t != null) images[i] = t.GetComponent<Image>();
+            }
+        }
+
+        if (boomImages == null || boomImages.Length == 0 || boomImages[0] == null)
+        {
+            boomImages = new Image[3];
+            for (int i = 0; i < 3; i++)
+            {
+                Transform t = ct.Find("Boom_" + (i + 1));
+                if (t != null) boomImages[i] = t.GetComponent<Image>();
+            }
+        }
+
+        if (gameOverPanel == null)
+        {
+            Transform t = ct.Find("GameOverPanel");
+            if (t != null) gameOverPanel = t.gameObject;
+        }
+
+        if (retryButton == null && gameOverPanel != null)
+            retryButton = gameOverPanel.GetComponentInChildren<Button>(true);
+
+        if (scoreText == null)
+        {
+            Transform t = ct.Find("ScoreText");
+            if (t != null) scoreText = t.GetComponent<TextMeshProUGUI>();
+        }
     }
 
     void OnDestroy()
@@ -94,49 +136,6 @@ public class UIManager : MonoBehaviour
         }
 
         return ShowGameOver();
-    }
-
-    public void HandlePlayerHit(GameObject playerGo, Vector3 respawnPosition, float respawnDelay)
-    {
-        if (playerGo == null)
-            return;
-
-        bool isGameOver = DecreaseLife();
-        playerGo.SetActive(false);
-
-        if (isGameOver)
-            return;
-
-        StartCoroutine(RespawnPlayer(playerGo, respawnPosition, respawnDelay));
-    }
-
-    IEnumerator RespawnPlayer(GameObject playerGo, Vector3 respawnPosition, float respawnDelay)
-    {
-        if (playerGo == null)
-            yield break;
-
-        yield return new WaitForSeconds(respawnDelay);
-        if (playerGo == null)
-            yield break;
-        if (gameOverPanel != null && gameOverPanel.activeSelf)
-            yield break;
-
-        playerGo.transform.position = respawnPosition;
-        playerGo.SetActive(true);
-
-        Player playerScript = playerGo.GetComponent<Player>();
-        if (playerScript != null)
-        {
-            playerScript.SetInvincible(true);
-            StartCoroutine(EndInvincibleAfter(playerScript, respawnInvincibleDuration));
-        }
-    }
-
-    IEnumerator EndInvincibleAfter(Player player, float duration)
-    {
-        yield return new WaitForSeconds(duration);
-        if (player != null)
-            player.SetInvincible(false);
     }
 
     public void OnRetryButtonClick()
