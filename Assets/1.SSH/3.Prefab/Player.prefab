@@ -131,12 +131,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
   speed: 5
-  bulletPrefab: {fileID: 1361555542674544354, guid: 8eb7f116a30342b4aa9da04c1343c920, type: 3}
+  hp: 3
+  bulletDamage: 5
   fireInterval: 0.12
   bulletSpawnOffset: {fileID: 8216774739323740194}
   sideBulletPrefab: {fileID: 1361555542674544354, guid: 8eb7f116a30342b4aa9da04c1343c920, type: 3}
   centerBulletPrefab: {fileID: 505163898674363755, guid: e62dcf2e041b1d64babcd1ddbf25ed0d, type: 3}
-  power: 3
+  boomAnimationPrefab: {fileID: 696356449074627141, guid: 27a1b9b909909c844a9632d399761eac, type: 3}
+  power: 1
   sideOffset: 0.25
 --- !u!50 &8489599096907396389
 Rigidbody2D:
