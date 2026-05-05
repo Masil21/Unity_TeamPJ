@@ -11,6 +11,7 @@ public class EnemyController : MonoBehaviour
 
     private Animator animator;
     private bool isHit = false;
+    private bool isDead = false;
     private Vector3 moveDirection = Vector3.down;
     private SpawnPoint spawner;
     private int maxHp;
@@ -29,6 +30,7 @@ public class EnemyController : MonoBehaviour
     {
         hp = maxHp;
         isHit = false;
+        isDead = false;
         StopAllCoroutines();
         if (animator != null) animator.SetInteger("State", 0);
         StartCoroutine(Move());
@@ -55,21 +57,16 @@ public class EnemyController : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        if (isHit) return;
+        if (isHit || isDead) return;
         hp -= damage;
         if (hp <= 0)
         {
+            isDead = true;
             onDie?.Invoke(transform.position);
             ReturnToPool();
             return;
         }
         StartCoroutine(HitRoutine());
-    }
-
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("PlayerBullet"))
-            TakeDamage(5);
     }
 
     IEnumerator HitRoutine()

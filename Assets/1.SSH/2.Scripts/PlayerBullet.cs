@@ -23,7 +23,8 @@ public class PlayerBullet : MonoBehaviour
     {
         if (other.CompareTag("Enemy"))
         {
-            other.SendMessage("TakeDamage", damage);
+            EnemyController ec = other.GetComponent<EnemyController>();
+            if (ec != null) ec.TakeDamage(damage);
             Destroy(gameObject);
         }
     }

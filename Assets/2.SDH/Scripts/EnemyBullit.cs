@@ -6,7 +6,7 @@ public class EnemyBullit : MonoBehaviour
     public GameObject bulletPrefab;
     public Transform firePoint;
 
-    void Start()
+    void OnEnable()
     {
         StartCoroutine(FireRoutine());
     }

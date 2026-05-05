@@ -42,8 +42,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0e758f233c4e07b4fadb9ff593c482fd, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemManager3
-  coinPrefab: {fileID: 0}
-  powerPrefab: {fileID: 0}
-  boomPrefab: {fileID: 0}
+  coinPrefab: {fileID: 1000000000000001, guid: 1c23f89e52d6e4042ab86b8de1937ec8, type: 3}
+  powerPrefab: {fileID: 2000000000000001, guid: 18b9ef51823ec4a4c94aad63611c5552, type: 3}
+  boomPrefab: {fileID: 3000000000000001, guid: 207ee0d4c58c55045bf57763938851a6, type: 3}

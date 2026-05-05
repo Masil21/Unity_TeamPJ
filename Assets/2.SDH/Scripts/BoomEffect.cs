@@ -3,14 +3,8 @@ using UnityEngine;
 
 public class BoomEffect : MonoBehaviour
 {
-    private Animator animator;
-
     void Start()
     {
-        animator = GetComponent<Animator>();
-        if (animator != null)
-            animator.SetInteger("State", 1);
-
         StartCoroutine(BoomRoutine());
     }
 

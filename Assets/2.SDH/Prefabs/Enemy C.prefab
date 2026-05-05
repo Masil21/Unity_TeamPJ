@@ -209,7 +209,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df5ecce346c099d4b9c9b4ace8a38496, type: 3}
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBullit
-  bulletPrefab: {fileID: 0}
+  bulletPrefab: {fileID: 5000000000000001, guid: 3441ac31a770a8c4f8824f918145afaa, type: 3}
   firePoint: {fileID: 9222222222222222}
 --- !u!1 &9111111111111111
 GameObject:
