@@ -6,7 +6,6 @@ using TMPro;
 
 public class UIManager : MonoBehaviour
 {
-    // [접근] Player.cs, Enemy.cs, GameManager.cs에서 사용
     public static UIManager Instance;
 
     public Image[] images;
@@ -14,9 +13,12 @@ public class UIManager : MonoBehaviour
     public GameObject gameOverPanel;
     public Button retryButton;
     public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI finalScoreText;
+
+    [SerializeField] float respawnInvincibleDuration = 2f;
 
     private int score;
-    private int boomCount = 0;
+    private int boomCount;
     private int lastScoreShown = int.MinValue;
 
     void Awake()
@@ -51,6 +53,9 @@ public class UIManager : MonoBehaviour
 
     bool ShowGameOver()
     {
+        if (finalScoreText != null)
+            finalScoreText.text = score.ToString("#,##0");
+
         if (gameOverPanel != null)
             gameOverPanel.SetActive(true);
         return true;
@@ -118,6 +123,20 @@ public class UIManager : MonoBehaviour
 
         playerGo.transform.position = respawnPosition;
         playerGo.SetActive(true);
+
+        Player playerScript = playerGo.GetComponent<Player>();
+        if (playerScript != null)
+        {
+            playerScript.SetInvincible(true);
+            StartCoroutine(EndInvincibleAfter(playerScript, respawnInvincibleDuration));
+        }
+    }
+
+    IEnumerator EndInvincibleAfter(Player player, float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        if (player != null)
+            player.SetInvincible(false);
     }
 
     public void OnRetryButtonClick()
@@ -133,23 +152,6 @@ public class UIManager : MonoBehaviour
         score += amount;
         UpdateScoreText(force: false);
     }
-
-    // public void AddScoreByEnemyType(Enemy.EnemyType enemyType)
-    // {
-    //     int delta = enemyType switch
-    //     {
-    //         Enemy.EnemyType.A => 100,
-    //         Enemy.EnemyType.B => 200,
-    //         Enemy.EnemyType.C => 300,
-    //         _ => 0
-    //     };
-    //
-    //     if (delta == 0)
-    //         return;
-    //
-    //     score += delta;
-    //     UpdateScoreText(force: false);
-    // }
 
     void UpdateScoreText(bool force)
     {

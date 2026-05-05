@@ -2,11 +2,8 @@ using UnityEngine;
 
 public class BackgroundScroller : MonoBehaviour
 {
-    [Header("Scroll")]
-    [Tooltip("낮을수록 느리게 내려감. Bottom < Middle < Top 으로 다르게 두면 패럴랙스")]
     public float scrollSpeed = 2f;
 
-    [Tooltip("0이면 자식 SpriteRenderer bounds 높이 사용. 스프라이트 없을 때만 수동 입력")]
     [SerializeField] float manualLoopHeight;
 
     Transform _t;

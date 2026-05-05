@@ -1,7 +1,5 @@
-using TMPro;
 using UnityEngine;
 
-// 플레이어 프리팹: Assets/1.SSH/3.Prefab/Player.prefab
 public class Player : MonoBehaviour
 {
     public float speed = 5f;
@@ -20,8 +18,15 @@ public class Player : MonoBehaviour
     public int power = 1;
     public float sideOffset = 0.25f;
 
+    [SerializeField] float respawnDelay = 1f;
+
+    bool _isInvincible;
+    Vector3 _respawnPosition;
+
     void Start()
     {
+        _respawnPosition = transform.position;
+
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
         _halfWidth = sr.bounds.extents.x;
         _halfHeight = sr.bounds.extents.y;
@@ -45,39 +50,92 @@ public class Player : MonoBehaviour
             _fireTimer = 0f;
         }
 
-        if (Input.GetMouseButtonUp(1))
-        {
-            if (UIManager.Instance != null && UIManager.Instance.UseBoom())
-            {
-                // TODO: SkillBoom 프리팹 생성 — 폭탄 단계에서 구현
-            }
+        if (Input.GetMouseButtonDown(1) && UIManager.Instance != null)
+            UIManager.Instance.UseBoom();
+    }
 
+    public void TakeDamage()
+    {
+        if (_isInvincible)
+            return;
+
+        power = 1;
+        if (UIManager.Instance != null)
+            UIManager.Instance.HandlePlayerHit(gameObject, _respawnPosition, respawnDelay);
+    }
+
+    public void PowerUp()
+    {
+        if (power < 3)
+            power++;
+    }
+
+    public void SetInvincible(bool value)
+    {
+        _isInvincible = value;
+    }
+
+    public void AddBoom()
+    {
+        if (UIManager.Instance != null)
+            UIManager.Instance.AddBoom();
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        Item3 item = other.GetComponent<Item3>();
+        if (item == null)
+            return;
+
+        if (UIManager.Instance == null)
+            return;
+
+        switch (item.itemType)
+        {
+            case Item3.ItemType.Coin:
+                UIManager.Instance.AddScore(100);
+                break;
+            case Item3.ItemType.Power:
+                PowerUp();
+                UIManager.Instance.AddScore(200);
+                break;
+            case Item3.ItemType.Boom:
+                AddBoom();
+                UIManager.Instance.AddScore(300);
+                break;
         }
+
+        Destroy(other.gameObject);
     }
 
     void Fire()
     {
+        if (bulletSpawnOffset == null)
+            return;
+
         switch (power)
         {
             case 1:
                 SpawnBullet(sideBulletPrefab, Vector3.zero);
                 break;
-            
+
             case 2:
-                SpawnBullet(sideBulletPrefab,Vector3.left * sideOffset);
-                SpawnBullet(sideBulletPrefab,Vector3.right * sideOffset);
+                SpawnBullet(sideBulletPrefab, Vector3.left * sideOffset);
+                SpawnBullet(sideBulletPrefab, Vector3.right * sideOffset);
                 break;
-            
+
             case 3:
                 SpawnBullet(centerBulletPrefab, Vector3.zero);
-                SpawnBullet(sideBulletPrefab,Vector3.left * sideOffset);
-                SpawnBullet(sideBulletPrefab,Vector3.right * sideOffset);
+                SpawnBullet(sideBulletPrefab, Vector3.left * sideOffset);
+                SpawnBullet(sideBulletPrefab, Vector3.right * sideOffset);
                 break;
         }
     }
 
     void SpawnBullet(GameObject prefab, Vector3 offset)
     {
+        if (prefab == null)
+            return;
         Instantiate(prefab, bulletSpawnOffset.position + offset, Quaternion.identity);
     }
 
@@ -97,21 +155,14 @@ public class Player : MonoBehaviour
         pos.y = Mathf.Clamp(pos.y, min.y + _halfHeight, max.y - _halfHeight);
         transform.position = pos;
 
-        // 애니메이션 처리
         if (_animator != null)
         {
             if (h > 0)
-            {
                 _animator.SetInteger("State", StateRight);
-            }
             else if (h < 0)
-            {
                 _animator.SetInteger("State", StateLeft);
-            }
             else
-            {
                 _animator.SetInteger("State", StateIdle);
-            }
         }
     }
 }
