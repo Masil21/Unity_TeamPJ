@@ -25,6 +25,7 @@ public class Player : MonoBehaviour
     private float _halfHeight;
     private Animator _animator;
     private bool _isInvincible = false;
+    private bool _isRespawning = false;
 
     private const int StateIdle = 0;
     private const int StateLeft = 1;
@@ -44,7 +45,7 @@ public class Player : MonoBehaviour
     {
         MovePlayer();
 
-        if (Input.GetMouseButton(0))
+        if (!_isRespawning && Input.GetMouseButton(0))
         {
             _fireTimer += Time.deltaTime;
             if (_fireTimer >= fireInterval)
@@ -58,7 +59,7 @@ public class Player : MonoBehaviour
             _fireTimer = 0f;
         }
 
-        if (Input.GetMouseButtonUp(1))
+        if (!_isRespawning && Input.GetMouseButtonUp(1))
         {
             bool used = UIManager.Instance != null
                 ? UIManager.Instance.UseBoom()
@@ -117,11 +118,13 @@ public class Player : MonoBehaviour
     IEnumerator RespawnRoutine()
     {
         _isInvincible = true;
+        _isRespawning = true;
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
         if (sr != null) sr.enabled = false;
         yield return new WaitForSeconds(respawnDelay);
         transform.position = _startPos;
         if (sr != null) sr.enabled = true;
+        _isRespawning = false;
         yield return new WaitForSeconds(2f);
         _isInvincible = false;
     }
