@@ -1,43 +1,20 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
 public class BoomEffect : MonoBehaviour
 {
+    public static event Action OnBoom;
+
     void Start()
     {
+        OnBoom?.Invoke();
         StartCoroutine(BoomRoutine());
     }
 
     IEnumerator BoomRoutine()
     {
-        float elapsed = 0f;
-
-        while (elapsed < 2f)
-        {
-            DestroyAllEnemies();
-            DestroyAllEnemyBullets();
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-
+        yield return new WaitForSeconds(2f);
         Destroy(gameObject);
-    }
-
-    void DestroyAllEnemies()
-    {
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-        foreach (GameObject enemy in enemies)
-        {
-            EnemyController ec = enemy.GetComponent<EnemyController>();
-            if (ec != null)
-                ec.TakeDamage(9999);
-        }
-    }
-
-    void DestroyAllEnemyBullets()
-    {
-        GameObject[] bullets = GameObject.FindGameObjectsWithTag("EnemyBullet");
-        foreach (GameObject bullet in bullets)
-            Destroy(bullet);
     }
 }

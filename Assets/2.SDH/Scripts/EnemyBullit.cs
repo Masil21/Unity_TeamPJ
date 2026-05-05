@@ -15,20 +15,22 @@ public class EnemyBullit : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(2f); // 2초 스캔
+            yield return new WaitForSeconds(2f);
 
-            GameObject playerGo = GameObject.FindWithTag("Player");
-            if (playerGo == null) continue;
+            if (Player.Instance == null) continue;
 
-            Vector3 dir = (playerGo.transform.position - firePoint.position).normalized;
+            Vector3 dir = (Player.Instance.transform.position - firePoint.position).normalized;
             Fire(dir);
         }
     }
 
     void Fire(Vector3 dir)
     {
-        if (bulletPrefab == null || firePoint == null) return;
-        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+        if (firePoint == null) return;
+        GameObject bullet = EnemyBulletPool.Instance != null
+            ? EnemyBulletPool.Instance.Get(firePoint.position)
+            : Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+        if (bullet == null) return;
         EnemyBullitController ctrl = bullet.GetComponent<EnemyBullitController>();
         if (ctrl != null) ctrl.SetDirection(dir);
     }

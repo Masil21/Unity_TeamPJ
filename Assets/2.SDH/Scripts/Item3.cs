@@ -8,7 +8,7 @@ public class Item3 : MonoBehaviour
 
     private float speed = 1f;
 
-    void Start()
+    void OnEnable()
     {
         StartCoroutine(Move());
     }
@@ -17,17 +17,21 @@ public class Item3 : MonoBehaviour
     {
         while (true)
         {
-            if (this == null) yield break;
             transform.Translate(Vector3.down * speed * Time.deltaTime);
             yield return null;
-            if (this == null) yield break;
             if (transform.position.y <= -5.5f)
             {
-                Destroy(gameObject);
+                ReturnToPool();
                 yield break;
             }
         }
     }
 
-
+    void ReturnToPool()
+    {
+        if (ItemManager3.Instance != null)
+            ItemManager3.Instance.ReturnItem(gameObject);
+        else
+            Destroy(gameObject);
+    }
 }

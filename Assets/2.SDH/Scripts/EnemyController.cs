@@ -6,6 +6,7 @@ public class EnemyController : MonoBehaviour
 {
     public float speed = 1f;
     public int hp = 16;
+    public int scoreValue = 100;
 
     public Action<Vector3> onDie;
 
@@ -22,6 +23,10 @@ public class EnemyController : MonoBehaviour
         maxHp = hp;
     }
 
+    void OnEnable()  { BoomEffect.OnBoom += BoomKill; }
+    void OnDisable() { BoomEffect.OnBoom -= BoomKill; }
+    void BoomKill()  { TakeDamage(9999); }
+
     public void SetSpawner(SpawnPoint sp) { spawner = sp; }
 
     public void SetDirection(Vector3 dir) { moveDirection = dir; }
@@ -35,10 +40,6 @@ public class EnemyController : MonoBehaviour
         if (animator != null) animator.SetInteger("State", 0);
         StartCoroutine(Move());
     }
-
-    void Start() { }
-
-    void Update() { }
 
     IEnumerator Move()
     {
@@ -62,6 +63,7 @@ public class EnemyController : MonoBehaviour
         if (hp <= 0)
         {
             isDead = true;
+            UIManager.Instance?.AddScore(scoreValue);
             onDie?.Invoke(transform.position);
             ReturnToPool();
             return;
